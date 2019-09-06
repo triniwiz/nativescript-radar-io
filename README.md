@@ -52,7 +52,7 @@ For increased reliability and responsiveness in the background, you should also 
 First, import the module:
 
 ```typescript
-import { Radar } from 'nativescript-radar-io';
+import { RadarIO } from 'nativescript-radar-io';
 ```
 
 ### Enable Places
@@ -62,13 +62,13 @@ If you are using Places, you must set Facebook as your place data provider.
 To set Facebook as your place data provider, call:
 
 ```javascript
-Radar.setPlacesProvider('facebook');
+RadarIO.setPlacesProvider('facebook');
 ```
 
 To disable Places later, call:
 
 ```javascript
-Radar.setPlacesProvider('none');
+RadarIO.setPlacesProvider('none');
 ```
 
 Learn more about [Places](https://radar.io/documentation/places).
@@ -80,7 +80,7 @@ Until you identify the user, Radar will automatically identify the user by devic
 To identify the user when logged in, call:
 
 ```javascript
-Radar.setUserId(userId);
+RadarIO.setUserId(userId);
 ```
 
 where `userId` is a stable unique ID string for the user.
@@ -90,7 +90,7 @@ Do not send any PII, like names, email addresses, or publicly available IDs, for
 To set an optional dictionary of custom metadata for the user, call:
 
 ```javascript
-Radar.setMetadata(metadata);
+RadarIO.setMetadata(metadata);
 ```
 
 where `metadata` is a JSON object with up to 16 keys and values of type string, boolean, or number.
@@ -98,7 +98,7 @@ where `metadata` is a JSON object with up to 16 keys and values of type string, 
 Finally, to set an optional description for the user, displayed in the dashboard, call:
 
 ```javascript
-Radar.setDescription(description);
+RadarIO.setDescription(description);
 ```
 
 where `description` is a string.
@@ -112,7 +112,7 @@ Before tracking the user's location, the user must have granted location permiss
 To determine the whether user has granted location permissions for the app, call:
 
 ```javascript
-Radar.getPermissionsStatus().then((status) => {
+RadarIO.getPermissionsStatus().then((status) => {
   // do something with status
 });
 ```
@@ -126,7 +126,7 @@ Radar.getPermissionsStatus().then((status) => {
 To request location permissions for the app, call:
 
 ```javascript
-Radar.requestPermissions(background);
+RadarIO.requestPermissions(background);
 ```
 
 where `background` is a boolean indicating whether to request background location permissions or foreground location permissions. On Android, `background` will be ignored.
@@ -138,7 +138,7 @@ Once you have initialized the SDK, you have identified the user, and the user ha
 To track the user's location in the foreground, call:
 
 ```javascript
-Radar.trackOnce().then((result) => {
+RadarIO.trackOnce().then((result) => {
   // do something with result.location, result.events, result.user.geofences
 }).catch((err) => {
   // optionally, do something with err
@@ -162,7 +162,7 @@ Once you have initialized the SDK, you have identified the user, and the user ha
 To start tracking the user's location in the background, call:
 
 ```javascript
-Radar.startTracking();
+RadarIO.startTracking();
 ```
 
 Assuming you have configured your project properly, the SDK will wake up while the user is moving (usually every 3-5 minutes), then shut down when the user stops (usually within 5-10 minutes). To save battery, the SDK will not wake up when stopped, and the user must move at least 100 meters from a stop (sometimes more) to wake up the SDK. **Note that location updates may be delayed significantly by iOS [Low Power Mode](https://support.apple.com/en-us/HT205234), by Android [Doze Mode and App Standby](https://developer.android.com/training/monitoring-device-state/doze-standby.html) and [Background Location Limits](https://developer.android.com/about/versions/oreo/background-location-limits.html), or if the device has connectivity issues, low battery, or wi-fi disabled. These constraints apply to all uses of background location services on iOS and Android, not just Radar. See more about [accuracy and reliability](https://radar.io/documentation/sdk#accuracy).**
@@ -170,7 +170,7 @@ Assuming you have configured your project properly, the SDK will wake up while t
 Optionally, you can configure advanced tracking options. See the [iOS background tracking documentation](https://radar.io/documentation/sdk#ios-background) and [Android background tracking documentation](https://radar.io/documentation/sdk#android-background) for descriptions of these options.
 
 ```javascript
-Radar.startTracking({
+RadarIO.startTracking({
   priority: 'responsiveness', // // use 'efficiency' to avoid Android vitals bad behavior thresholds (ignored on iOS)
   sync: 'possibleStateChanges', // use 'all' to sync all location updates ('possibleStateChanges' recommended)
   offline: 'replayStopped' // use 'replayOff' to disable offline replay ('replayStopped' recommended)
@@ -180,7 +180,7 @@ Radar.startTracking({
 To stop tracking the user's location in the background (e.g., when the user logs out), call:
 
 ```javascript
-Radar.stopTracking();
+RadarIO.stopTracking();
 ```
 
 You only need to call these methods once, as these settings will be persisted across app sessions.
@@ -188,15 +188,15 @@ You only need to call these methods once, as these settings will be persisted ac
 To listen for events, location updates, and errors, you can add event listeners:
 
 ```javascript
-Radar.on('events', (result) => {
+RadarIO.on('events', (result) => {
   // do something with result.events, result.user
 });
 
-Radar.on('location', (result) => {
+RadarIO.on('location', (result) => {
   // do something with result.location, result.user
 });
 
-Radar.on('error', (err) => {
+RadarIO.on('error', (err) => {
   // do something with err
 });
 ```
@@ -206,11 +206,11 @@ Add event listeners outside of your component lifecycle (e.g., outside of `compo
 You can also remove event listeners:
 
 ```javascript
-Radar.off('events');
+RadarIO.off('events');
 
-Radar.off('location');
+RadarIO.off('location');
 
-Radar.off('error');
+RadarIO.off('error');
 ```
 
 ### Battery usage
@@ -238,7 +238,7 @@ const location = {
   accuracy: 65
 };
 
-Radar.updateLocation(location).then((result) => {
+RadarIO.updateLocation(location).then((result) => {
   // do something with result.events, result.user.geofences
 }).catch((err) => {
   // optionally, do something with err
