@@ -21,7 +21,7 @@ To get a Radar publishable API key, [sign up for a Radar account](https://radar.
 
 > To track the user's location in the background, you must also add a string for the NSLocationAlwaysUsageDescription (iOS 10 and before) and NSLocationAlwaysAndWhenInUseUsageDescription (iOS 11 and later) keys in your Info.plist file if you haven't already. These strings will be displayed when prompting the user for background location permissions.
 
-```
+```xml
 <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 <string>Your iOS 11 and higher background location usage description goes here. e.g., "This app uses your location in the background to recommend places nearby."</string>
 
@@ -36,7 +36,7 @@ For increased reliability and responsiveness in the background, you should also 
 
 **Add to Info.plist**
 
-```
+```xml
 <key>UIBackgroundModes</key>
 <array>
   <string>fetch</string>
