@@ -51,10 +51,10 @@ export class RadarIO {
 
     public static initialize(publishableKey: string): void {
         Radar.initializeWithPublishableKey(publishableKey);
-        // if (!RadarIO.delegate) {
-        //     RadarIO.delegate = RadarDelegateImpl.new() as any;
-        // }
-        // Radar.setDelegate(RadarIO.delegate);
+         if (!RadarIO.delegate) {
+             RadarIO.delegate = RadarDelegateImpl.new() as any;
+         }
+         Radar.setDelegate(RadarIO.delegate);
     }
 
     public static setUserId(id: string) {
@@ -103,7 +103,6 @@ export class RadarIO {
                 resolve,
                 reject
             );
-            console.log('delegate - ', delegate)
             managers[delegate.id] = manager;
             managerDelegates[delegate.id] = delegate;
             manager.delegate = delegate;
@@ -422,7 +421,6 @@ class CLLocationManagerDelegateImpl extends NSObject
         reject
     ): CLLocationManagerDelegateImpl {
         const delegate = CLLocationManagerDelegateImpl.new() as CLLocationManagerDelegateImpl;
-        console.log('delegate - ', delegate)
         delegate._resolve = resolve;
         delegate._reject = reject;
         delegate.id = NSUUID.UUID().UUIDString;
