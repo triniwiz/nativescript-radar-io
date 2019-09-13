@@ -3,18 +3,20 @@ import { NavigatedData, Page } from 'tns-core-modules/ui/page';
 import { HomeViewModel } from './home-view-model';
 import { RadarIO } from 'nativescript-radar-io';
 import { error } from 'tns-core-modules/trace';
+import { getCurrentLocation } from 'nativescript-geolocation';
 
 export async function onNavigatingTo(args: NavigatedData) {
     const page = <Page>args.object;
     page.bindingContext = new HomeViewModel();
+    console.log('onNavigatingTo');
     await RadarIO.requestPermissions(true);
-    RadarIO.startTracking({
-        offline: 'replayOff',
-        sync: 'all',
-        priority: 'responsiveness'
-    });
-    if (!RadarIO.isTracking()) {
 
+    if (!RadarIO.isTracking()) {
+        RadarIO.startTracking({
+            offline: 'replayOff',
+            sync: 'all',
+            priority: 'responsiveness'
+        });
     }
     RadarIO.on('location', (event) => {
         console.log('location');
@@ -36,11 +38,11 @@ export async function onNavigatingTo(args: NavigatedData) {
             user: events.object.get('user')
         })
     });
-    RadarIO.trackOnce().then(result => {
-        console.log('trackonce');
-        console.dir(result);
-    });
-    /* getCurrentLocation({timeout: 10000}).then(location => {
+    // RadarIO.trackOnce().then(result => {
+    //     console.log('trackonce');
+    //     console.dir(result);
+    // });
+     getCurrentLocation({timeout: 10000}).then(location => {
          return RadarIO.updateLocation({
              accuracy: location.horizontalAccuracy,
              longitude: location.longitude,
@@ -49,5 +51,5 @@ export async function onNavigatingTo(args: NavigatedData) {
      }).then(result => {
          console.log('updateLocation');
          console.dir(result);
-     })*/
+     })
 }
