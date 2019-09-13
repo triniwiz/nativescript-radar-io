@@ -17,7 +17,7 @@ import {
     RadarIOUser
 } from './radar-io.common';
 import * as types from 'tns-core-modules/utils/types';
-import { Observable } from 'tns-core-modules/data/observable';
+import { fromObject, Observable } from 'tns-core-modules/data/observable';
 import * as utils from 'tns-core-modules/utils/utils';
 import * as app from 'tns-core-modules/application';
 
@@ -40,7 +40,7 @@ export {
     RadarIOTrackingOptions
 };
 
-require('./receiver');
+declare var com;
 
 export class RadarIO {
 
@@ -50,8 +50,33 @@ export class RadarIO {
         return io.radar.sdk.Radar.isTracking();
     }
 
+    private static isSetup: boolean;
+
     public static initialize(publishableKey: string): void {
         io.radar.sdk.Radar.initialize(publishableKey);
+        if (!this.isSetup) {
+            com.github.triniwiz.radario.RadarIOPlugin.setListener(new com.github.triniwiz.radario.RadarIOPlugin.Listener({
+                onEvents(events: string) {
+                    RadarIO.events.notify({
+                        eventName: 'events',
+                        object: fromObject(JSON.parse(events))
+                    })
+                },
+                onLocation(location: string) {
+                    RadarIO.events.notify({
+                        eventName: 'location',
+                        object: fromObject(JSON.parse(location))
+                    })
+                },
+                onError(error: string) {
+                    RadarIO.events.notify({
+                        eventName: 'error',
+                        object: fromObject(JSON.parse(error))
+                    })
+                }
+            }));
+            this.isSetup = true;
+        }
     }
 
     public static setUserId(id: string) {
@@ -147,14 +172,20 @@ export class RadarIO {
     public static trackOnce(): Promise<RadarIOResult> {
         return new Promise((resolve, reject) => {
             io.radar.sdk.Radar.trackOnce(new io.radar.sdk.Radar.RadarCallback({
-                onComplete(status: io.radar.sdk.Radar.RadarStatus, location: android.location.Location, events: native.Array<io.radar.sdk.model.RadarEvent>, user: io.radar.sdk.model.RadarUser) {
-                    const result: RadarIOResult = {
-                        status: RadarIO.getStatus(status),
-                        user: RadarIO.getUser(user),
-                        events: RadarIO.getEvents(events),
-                        location: RadarIO.getLocation(location)
-                    };
-                    resolve(result);
+                onComplete(status: io.radar.sdk.Radar.RadarStatus, location: android.location.Location, events: any, user: io.radar.sdk.model.RadarUser) {
+                    if (status === io.radar.sdk.Radar.RadarStatus.SUCCESS) {
+                        const result: RadarIOResult = {
+                            status: RadarIO.getStatus(status),
+                            user: RadarIO.getUser(user),
+                            events: RadarIO.getEvents(events),
+                            location: RadarIO.getLocation(location)
+                        };
+                        resolve(result);
+                    } else {
+                        reject({
+                            status: RadarIO.getStatus(status)
+                        })
+                    }
                 }
             }));
         });
@@ -413,13 +444,19 @@ export class RadarIO {
             nativeLocation.setAccuracy(location.accuracy);
             io.radar.sdk.Radar.updateLocation(nativeLocation, new io.radar.sdk.Radar.RadarCallback({
                 onComplete(_status: io.radar.sdk.Radar.RadarStatus, location: android.location.Location, events: native.Array<io.radar.sdk.model.RadarEvent>, user: io.radar.sdk.model.RadarUser): void {
-                    const response: RadarIOResult = {
-                        status: RadarIO.getStatus(_status),
-                        location: RadarIO.getLocation(location),
-                        events: RadarIO.getEvents(events),
-                        user: RadarIO.getUser(user)
-                    };
-                    resolve(response);
+                    if (_status === io.radar.sdk.Radar.RadarStatus.SUCCESS) {
+                        const response: RadarIOResult = {
+                            status: RadarIO.getStatus(_status),
+                            location: RadarIO.getLocation(location),
+                            events: RadarIO.getEvents(events),
+                            user: RadarIO.getUser(user)
+                        };
+                        resolve(response);
+                    } else {
+                        reject({
+                            status: RadarIO.getStatus(_status)
+                        })
+                    }
                 }
             }))
         });
