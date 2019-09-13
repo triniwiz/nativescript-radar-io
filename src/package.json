@@ -1,6 +1,6 @@
 {
 	"name": "nativescript-radar-io",
-	"version": "0.0.1",
+	"version": "0.0.3",
 	"description": "NativeScript Radar.io SDK",
 	"main": "radar-io",
 	"typings": "index.d.ts",
