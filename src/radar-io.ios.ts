@@ -18,6 +18,7 @@ import {
 } from './radar-io.common';
 import * as types from 'tns-core-modules/utils/types';
 import { fromObject, Observable } from 'tns-core-modules/data/observable';
+import * as application from 'tns-core-modules/application';
 
 export {
     RadarIOResult,
@@ -50,11 +51,20 @@ export class RadarIO {
     }
 
     public static initialize(publishableKey: string): void {
-        Radar.initializeWithPublishableKey(publishableKey);
-         if (!RadarIO.delegate) {
-             RadarIO.delegate = RadarDelegateImpl.new() as any;
-         }
-         Radar.setDelegate(RadarIO.delegate);
+        const init = () => {
+            Radar.initializeWithPublishableKey(publishableKey);
+            if (!RadarIO.delegate) {
+                RadarIO.delegate = RadarDelegateImpl.new() as any;
+            }
+            Radar.setDelegate(RadarIO.delegate);
+        };
+        if (UIApplication.sharedApplication) {
+            init();
+        } else {
+            application.on(application.launchEvent, args => {
+                init();
+            });
+        }
     }
 
     public static setUserId(id: string) {
@@ -258,7 +268,7 @@ export class RadarIO {
                         code: region.code
                     }
                 }
-
+                _events.push(event);
             }
             return _events;
         }
